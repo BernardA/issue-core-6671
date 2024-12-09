@@ -21,58 +21,23 @@ use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\OpenApi\Model\Operation;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
-
 #[
     ORM\Entity(repositoryClass: UserRepository::class),
     UniqueEntity(fields: ['username'], message: 'Cet username existe déjà.', groups: ['user:post', 'user:patch']),
     ORM\HasLifecycleCallbacks,
     ApiResource(
-        security: "is_granted('ROLE_USER_ADMIN_SI')",
         normalizationContext: [
             'skip_null_values' => false,
             'enable_max_depth' => true,
             'groups' => ['user:get']
         ],
         operations: [
-            new Post(
-                denormalizationContext: ['groups' => ['user:post']],
-                validationContext: ['groups' => ['user:post']],
-                processor: UserProcessor::class,
-                openapi: false
-                // openapi: new Operation(
-                //     summary: 'Permet de créer un User API.',
-                //     description: "<p>Permet de créer un User API.<br>
-                //     Le <code>username</code> est requis et  doit contenir entre 3 et 50 caractères dont lettres majuscules et minuscules, chiffres et les caractères <code> _- </code>.<br>
-                //     Le <code>mot de passe</code> est requis et doit contenir entre 10 et 50 caractères dont au moins une lettre majuscule, une minuscule, un chiffre et un caractère spécial parmi <code> !@#$%^&* </code>.<br>
-                //     Les champs <code>rôles</code> et <code>isActive</code> sont facultatifs.</p>",
-                // )
-            ),
-            new GetCollection(
-                openapi: false
-                // openapi: new Operation(
-                //     summary: "Retourne la liste des Users API.",
-                //     description: "Retourne la liste des Users API."
-                // )
-            ),
             new Get(
                 // openapi: false
                 openapi: new Operation(
                     summary: "Retourne un User API.",
                     description: "Retourne le User API dont l'id est passé en paramètre.",
                 )
-            ),
-            new Patch(
-                denormalizationContext: ['groups' => ['user:patch']],
-                validationContext: ['groups' => ['user:patch']],
-                processor: UserProcessor::class,
-                openapi: false
-                // openapi: new Operation(
-                //     summary: "Permet de modifier un User API.",
-                //     description: "<p>Permet de modifier le User API dont l'id est passé en paramètre.<br>
-                //     Le <code>username</code> doit contenir entre 3 et 50 caractères dont lettres majuscules et minuscules, chiffres et les caractères <code> _- </code>.<br>
-                //     Le <code>mot de passe</code> doit contenir entre 10 et 50 caractères dont au moins une lettre majuscule, une minuscule, un chiffre et un caractère spécial parmi <code> !@#$%^&* </code>.<br>
-                //     Les champs sont facultatifs et restent inchangés si ils ne sont pas passés dans la requête.</p>",
-                // )
             )
         ]
     )
